@@ -2,25 +2,38 @@
 
 use {
 	objc::{class, msg_send, runtime::Object, sel, sel_impl, MessageError},
-	objc_id::{Id, ShareId},
+	objc_id::Id,
+	objc_foundation::{INSString, NSString},
 };
 
-/* See http://nspasteboard.org */
+/* https://docs.rs/arboard/3.3.2/x86_64-apple-darwin/src/arboard/platform/osx.rs.html#31-38
+ */
+#[link(name = "AppKit", kind = "framework")]
+extern "C" {
+	static NSPasteboardTypeString: *const Object;
+}
+
+/* http://nspasteboard.org */
 const TYPE_STRING: &str = "org.nspasteboard.ConcealedType";
 
 pub fn text<S: AsRef<str>>(s: S) -> Result<(), MessageError> {
 	unsafe { text_impl(s.as_ref()) }
 }
 
-/* Mostly copied from cacao::pasteboard */
 #[inline]
 unsafe fn text_impl(s: &str) -> Result<(), MessageError> {
-	let clipboard_ptr: ShareId<Object> =
-		ShareId::from_ptr(msg_send![class!(NSPasteboard), generalPasteboard]);
-	let nsstring: *mut Object = msg_send![class!(NSString), alloc];
-	let nss_ptr: Id<Object> = Id::from_ptr(msg_send![nsstring, initWithUTF8String: s]);
-	let type_ptr: Id<Object> =
-		Id::from_ptr(msg_send![class!(NSString), initWithUTF8String: TYPE_STRING]);
-	let _: () = msg_send![clipboard_ptr, setString: &*nss_ptr forType: &*type_ptr];
+	#[allow(non_snake_case)]
+	let NSPasteboard = class!(NSPasteboard);
+	let pasteboard: Id<Object> = msg_send![NSPasteboard, generalPasteboard];
+	let nss_s: Id<NSString> = NSString::from_str(s);
+	let nss_type: Id<NSString> = NSString::from_str(TYPE_STRING);
+
+	let _: () = msg_send![pasteboard, clearContents];
+	/* https://github.com/roosto/pbsecret/blob/9e91917de0/pbsecret.m#L100-L101
+	 *
+	 * Probably should be done with writeObjects but this is easier.
+	 */
+	let _: () = msg_send![pasteboard, setString: NSString::from_str("secret") forType: nss_type];
+	let _: () = msg_send![pasteboard, setString: nss_s forType: NSPasteboardTypeString];
 	Ok(())
 }
