@@ -3,7 +3,7 @@ name = 'blindcopy'
 description = 'Copy data to clipboard without appearing in history or sync.'
 license = 'BSD-3-Clause'
 repository = 'https://github.com/nc7s/blindcopy'
-version = '0.1.0'
+version = '0.1.1'
 edition = '2021'
 
 [target.'cfg(target_os = "linux")'.dependencies]
