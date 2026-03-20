@@ -13,7 +13,9 @@ extern "C" {
 unsafe fn read_pasteboard_string(type_obj: *const Object) -> Option<String> {
 	#[allow(non_snake_case)]
 	let NSPasteboard = class!(NSPasteboard);
-	let pasteboard: Id<Object> = msg_send![NSPasteboard, generalPasteboard];
+	/* generalPasteboard is a shared singleton — use a raw pointer, not Id,
+	 * to avoid sending release on drop. */
+	let pasteboard: *const Object = msg_send![NSPasteboard, generalPasteboard];
 	let value: *const Object = msg_send![pasteboard, stringForType: type_obj];
 	if value.is_null() {
 		return None;
