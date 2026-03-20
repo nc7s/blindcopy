@@ -24,7 +24,8 @@ pub fn text<S: AsRef<str>>(s: S) -> Result<(), MessageError> {
 unsafe fn text_impl(s: &str) -> Result<(), MessageError> {
 	#[allow(non_snake_case)]
 	let NSPasteboard = class!(NSPasteboard);
-	let pasteboard: Id<Object> = msg_send![NSPasteboard, generalPasteboard];
+	/* generalPasteboard is a shared singleton — don't wrap in Id to avoid releasing it. */
+	let pasteboard: *mut Object = msg_send![NSPasteboard, generalPasteboard];
 	let nss_s: Id<NSString> = NSString::from_str(s);
 	let nss_type: Id<NSString> = NSString::from_str(TYPE_STRING);
 
