@@ -1,8 +1,9 @@
 [package]
 name = 'blindcopy'
 description = 'Copy data to clipboard without appearing in history or sync.'
+tags = ['clipboard', 'hidden']
 license = 'BSD-3-Clause'
-repository = 'https://github.com/nc7s/blindcopy'
+repository = 'https://codeberg.org/ncts/blindcopy'
 version = '0.1.1'
 edition = '2021'
 
