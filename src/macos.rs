@@ -2,8 +2,8 @@
 
 use {
 	objc::{class, msg_send, runtime::Object, sel, sel_impl, MessageError},
-	objc_id::Id,
 	objc_foundation::{INSString, NSString},
+	objc_id::Id,
 };
 
 /* https://docs.rs/arboard/3.3.2/x86_64-apple-darwin/src/arboard/platform/osx.rs.html#31-38
